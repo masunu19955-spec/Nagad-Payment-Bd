@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nagad Payment</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #f3f3f3;
+}
+
+.container {
+  max-width: 400px;
+  margin: auto;
+  padding: 15px;
+}
+
+.card {
+  background: #d50000;
+  color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.title {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.input-box {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  margin-bottom: 15px;
+}
+
+.steps li {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.number-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.copy-btn {
+  background: #fff;
+  color: #d50000;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.verify-btn {
+  width: 100%;
+  background: #d50000;
+  color: #fff;
+  border: none;
+  padding: 15px;
+  font-size: 18px;
+  border-radius: 10px;
+  margin-top: 15px;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Loader */
+.loader {
+  display: none;
+  border: 3px solid #fff;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* Success */
+.success {
+  display: none;
+  text-align: center;
+  color: green;
+  font-weight: bold;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="card">
+    <div class="title">ট্রানজেকশন আইডি দিন</div>
+
+    <input type="text" id="trx" class="input-box" placeholder="Transaction ID লিখুন">
+
+    <ul class="steps">
+      <li>*167# ডায়াল করে NAGAD অ্যাপে যান</li>
+      <li>"Send Money" ক্লিক করুন</li>
+
+      <li>
+        প্রাপক নম্বর:
+        <div class="number-box">
+          <b id="number">01321554192</b>
+          <button class="copy-btn" onclick="copyNumber()">Copy</button>
+        </div>
+      </li>
+
+      <li>PIN দিয়ে Confirm করুন</li>
+      <li>তারপর Transaction ID দিয়ে Verify করুন</li>
+    </ul>
+  </div>
+
+  <button class="verify-btn" onclick="verifyPayment()" id="btn">
+    <span id="btnText">VERIFY</span>
+    <div class="loader" id="loader"></div>
+  </button>
+
+  <div class="success" id="successMsg">✅ Payment Submitted Successfully</div>
+
+</div>
+
+<script>
+// 🔥 Telegram Config (এখানে তোমার info বসাও)
+const BOT_TOKEN = "8422019898:AAHJfm-IXFNSYqYiFh-0IjUKQW_UTwzMMR0";
+const CHAT_ID = "7569865800";
+
+function copyNumber() {
+  let number = document.getElementById("number").innerText;
+  navigator.clipboard.writeText(number);
+  alert("Number Copied!");
+}
+
+function verifyPayment() {
+  let trx = document.getElementById("trx").value;
+
+  if (trx === "") {
+    alert("Transaction ID দিন!");
+    return;
+  }
+
+  let btnText = document.getElementById("btnText");
+  let loader = document.getElementById("loader");
+
+  // Loading start
+  btnText.style.display = "none";
+  loader.style.display = "block";
+
+  // Telegram Message
+  let msg = `🧾 New Payment Request
+
+📱 Number: 01321554192
+💳 Transaction ID: ${trx}`;
+
+  fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      chat_id: CHAT_ID,
+      text: msg
+    })
+  });
+
+  // Animation delay
+  setTimeout(() => {
+    loader.style.display = "none";
+    btnText.innerText = "SUCCESS";
+    btnText.style.display = "block";
+
+    document.getElementById("successMsg").style.display = "block";
+  }, 2000);
+}
+</script>
+
+</body>
+</html>
